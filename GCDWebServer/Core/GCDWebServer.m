@@ -474,6 +474,7 @@ static inline NSString* _EncodeBase64(NSString* string) {
 }
 
 - (dispatch_source_t)_createDispatchSourceWithListeningSocket:(int)listeningSocket isIPv6:(BOOL)isIPv6 {
+  GWS_LOG_DEBUG(@"Enter into group");
   dispatch_group_enter(_sourceGroup);
   dispatch_source_t source = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, listeningSocket, 0, dispatch_get_global_queue(_dispatchQueuePriority, 0));
   dispatch_source_set_cancel_handler(source, ^{
@@ -485,6 +486,7 @@ static inline NSString* _EncodeBase64(NSString* string) {
         GWS_LOG_DEBUG(@"Did close %s listening socket %i", isIPv6 ? "IPv6" : "IPv4", listeningSocket);
       }
     }
+    GWS_LOG_DEBUG(@"Leave into group");
     dispatch_group_leave(self->_sourceGroup);
   });
   dispatch_source_set_event_handler(source, ^{
@@ -703,7 +705,10 @@ static inline NSString* _EncodeBase64(NSString* string) {
 
   dispatch_source_cancel(_source6);
   dispatch_source_cancel(_source4);
-  dispatch_group_wait(_sourceGroup, DISPATCH_TIME_FOREVER);  // Wait until the cancellation handlers have been called which guarantees the listening sockets are closed
+  GWS_LOG_DEBUG(@"Calling Group Wait");
+  long temp = dispatch_group_wait(_sourceGroup, DISPATCH_TIME_NOW);  // Wait until the cancellation handlers have been called which guarantees the listening sockets are closed
+  GWS_LOG_DEBUG(@"Response of Group wait is %ld", temp);
+
 #if !OS_OBJECT_USE_OBJC_RETAIN_RELEASE
   dispatch_release(_source6);
 #endif
