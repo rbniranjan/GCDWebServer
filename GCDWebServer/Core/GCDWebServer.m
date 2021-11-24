@@ -264,6 +264,8 @@ static void _ExecuteMainThreadRunLoopSources() {
 
 // Always called on main thread
 - (void)_endBackgroundTask {
+  GWS_LOG_DEBUG(@"background task");
+
   GWS_DCHECK([NSThread isMainThread]);
   if (_backgroundTask != UIBackgroundTaskInvalid) {
     [[UIApplication sharedApplication] endBackgroundTask:_backgroundTask];
@@ -666,6 +668,7 @@ static inline NSString* _EncodeBase64(NSString* string) {
 
 - (void)_stop {
   GWS_DCHECK(_source4 != NULL);
+  GWS_LOG_DEBUG(@"Stop method call");
 
   if (_dnsService) {
     _dnsAddress = nil;
